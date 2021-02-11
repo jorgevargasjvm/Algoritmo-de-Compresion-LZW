@@ -14,18 +14,19 @@ using namespace std;
 using namespace std; 
 
 vector<int> codificar(string filename) { 
-    ifstream fichero;
-    fichero.open(filename);
+    ifstream fileInput;
+    fileInput.open(filename);
     stringstream strStream;
-    strStream << fichero.rdbuf();
+    strStream << fileInput.rdbuf();
 
+    cout << filename << endl;
     string str = strStream.str();
     
-    unordered_map<string, int> table; 
+    unordered_map<string, int> dictionary; 
 	for (int i = 0; i <= 255; i++) { 
 		string ch = ""; 
 		ch += char(i); 
-		table[ch] = i; 
+		dictionary[ch] = i; 
 	} 
 
 	string p = "", c = ""; 
@@ -35,53 +36,81 @@ vector<int> codificar(string filename) {
 	for (int i = 0; i < str.length(); i++) { 
 		if (i != str.length() - 1) 
 			c += str[i + 1]; 
-		if (table.find(p + c) != table.end()) { 
+		if (dictionary.find(p + c) != dictionary.end()) { 
 			p = p + c; 
 		} 
 		else { 
 		
-			output_code.push_back(table[p]); 
-			table[p + c] = code; 
+			output_code.push_back(dictionary[p]); 
+			dictionary[p + c] = code; 
 			code++; 
 			p = c; 
 		} 
 		c = ""; 
 	} 
-	output_code.push_back(table[p]); 
+	output_code.push_back(dictionary[p]); 
     return output_code; 
 } 
-  
 
-void decodificar(vector<int> op) 
+void decodificar(string filename) 
 { 
-	unordered_map<int, string> table; 
-	for (int i = 0; i <= 255; i++) { 
-		string ch = ""; 
-		ch += char(i); 
-		table[i] = ch; 
-	} 
-	int old = op[0], n; 
-	string s = table[old]; 
-	string c = ""; 
-	c += s[0]; 
-	cout << s; 
-	int count = 256; 
-	for (int i = 0; i < op.size() - 1; i++) { 
-		n = op[i + 1]; 
-		if (table.find(n) == table.end()) { 
-			s = table[old]; 
-			s = s + c; 
-		} 
-		else { 
-			s = table[n]; 
-		} 
-		cout << s; 
-		c = ""; 
-		c += s[0]; 
-		table[count] = table[old] + c; 
-		count++; 
-		old = n; 
-	} 
+    string token;
+    ifstream myfile (filename);
+    if (myfile.is_open())
+    {
+        string line;
+        getline (myfile,line);
+        ofstream outfile (line);
+        if (outfile.is_open())
+        {
+            getline (myfile,line);
+
+
+            string OC(line);
+            string buf;                
+            stringstream ss(OC);      
+
+            vector<int> op; 
+
+            while (ss >> buf){
+                op.push_back(stoi(buf));
+            }
+
+            unordered_map<int, string> table; 
+            for (int i = 0; i <= 255; i++) { 
+                string ch = ""; 
+                ch += char(i); 
+                table[i] = ch; 
+            } 
+            int old = op[0], n; 
+            string s = table[old]; 
+            string c = ""; 
+            c += s[0]; 
+            outfile << s; 
+            int count = 256; 
+            for (int i = 0; i < op.size() - 1; i++) { 
+                n = op[i + 1]; 
+                if (table.find(n) == table.end()) { 
+                    s = table[old]; 
+                    s = s + c; 
+                } 
+                else { 
+                    s = table[n]; 
+                } 
+                outfile << s; 
+                c = ""; 
+                c += s[0]; 
+                table[count] = table[old] + c; 
+                count++; 
+                old = n; 
+            } 
+          
+            outfile.close();
+        }
+        myfile.close();
+    }
+
+
 } 
 
 int main(int argc, char *argv[]) { 
@@ -91,12 +120,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (strcmp(argv[1], "-u") == 0) {
-      /*  ifstream fichero_salida(argv[2], ios::in | ios::binary);
-        if (!fichero_salida) {
-            cerr << "No existe el fichero " << argv[2] << endl;
-            exit(0);
-        }
-        decodificar(fichero_salida);*/
+        decodificar(argv[2]);
     } else if(strcmp(argv[1], "-h")== 0){
         cout << "Formas de uso" <<endl;
         cout << "./lzw -u [file.lzw]" << "\t Utilice el comando -u para descomprimir el archivo deseado"<<endl;
@@ -104,12 +128,10 @@ int main(int argc, char *argv[]) {
     }else
     {
         vector<int> output_code = codificar(argv[1]); ; 
-        cout << "Output Codes are: "; 
         for (int i = 0; i < output_code.size(); i++) { 
             cout << output_code[i] << " "; 
         }
         cout << endl;
-
-        decodificar(output_code);
+        
     }
 } 
