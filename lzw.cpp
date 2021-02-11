@@ -7,6 +7,7 @@
 
 #define EJEMPLO "WYS*WYGWYS*WYSWYSG"
 
+/*
 #define SEPARADOR '|'
 
 using namespace std; 
@@ -26,10 +27,22 @@ short int leer_valor(istream_iterator<unsigned char> &it) {
 
     return v;
 }
-
+*/
 // Codificar la secuencia de caracteres del flujo de entrada y sacar
 // la secuencia comprimida por salida est�ndar
 void codificar(ifstream &ifs) { 
+    
+    ifstream file = *ifs;
+    vector<string> fileText;
+    if (myfile.is_open())
+    {
+        while ( getline (file,line) )
+        {
+            fileText.push_back(line);
+        }
+        file.close();
+    }
+
     unordered_map<string, long> diccionario; 
 
     for (int i = 0; i < 256; i++) { 
@@ -38,29 +51,7 @@ void codificar(ifstream &ifs) {
         diccionario[s] = i; 
     } 
       
-    istream_iterator<char> eos;
-    istream_iterator<char> iti (ifs);
-    string p = "", c = "";
-    short int codigo = 256; 
-
-    p += (char) *iti;    
-    while (iti != eos) {
-        iti++;
-        if (iti != eos)
-            c += *iti; 
-        if (diccionario.find(p + c) != diccionario.end()) { 
-            p = p + c; 
-        } 
-        else { 
-            secuencia_bytes(diccionario[p]);
-            //cout << diccionario[p];
-            diccionario[p + c] = codigo; 
-            codigo++; 
-            p = c; 
-        } 
-        c = "";
-    } 
-    secuencia_bytes(diccionario[p]);
+   
 } 
   
 // Decodificar la secuencia de caracteres del flujo de entrada y guardar
@@ -73,26 +64,6 @@ void decodificar(ifstream &ifs) {
         ch += char(i); 
         diccionario[i] = ch; 
     } 
-
-    istream_iterator<unsigned char> eos;
-    istream_iterator<unsigned char> iti (ifs);
-
-    // El nombre del fichero de salida est� al principio del 
-    // flujo de entrada, terminado en el caracter SEPARADOR
-    string fichero = "";
-    while ((unsigned char) *iti != SEPARADOR) {
-        fichero += (unsigned char) *iti;
-        iti++;        
-    }
-    iti++;
-
-    // Leer la longitud del fichero antes de comprimir
-    long int tamanyo = 0;
-    while ((unsigned char) *iti != SEPARADOR) {
-        tamanyo = tamanyo * 10 + (*iti - '0');
-        iti++;        
-    }
-    iti++;
 
     ofstream fichero_salida(fichero, ios::out | ios::binary);
     if (!fichero_salida) {
