@@ -11,7 +11,7 @@
 
 using namespace std; 
 
-// Convertir el índice del diccionario en una secuencia de bytes
+// Convertir el ï¿½ndice del diccionario en una secuencia de bytes
 void secuencia_bytes(short int dato) {
     cout << (unsigned char) (dato >> 8);    
     cout << (unsigned char) (dato & 255);
@@ -28,9 +28,9 @@ short int leer_valor(istream_iterator<unsigned char> &it) {
 }
 
 // Codificar la secuencia de caracteres del flujo de entrada y sacar
-// la secuencia comprimida por salida estándar
+// la secuencia comprimida por salida estï¿½ndar
 void codificar(ifstream &ifs) { 
-    unordered_map<string, short int> diccionario; 
+    unordered_map<string, long> diccionario; 
 
     for (int i = 0; i < 256; i++) { 
         string s = ""; 
@@ -77,7 +77,7 @@ void decodificar(ifstream &ifs) {
     istream_iterator<unsigned char> eos;
     istream_iterator<unsigned char> iti (ifs);
 
-    // El nombre del fichero de salida está al principio del 
+    // El nombre del fichero de salida estï¿½ al principio del 
     // flujo de entrada, terminado en el caracter SEPARADOR
     string fichero = "";
     while ((unsigned char) *iti != SEPARADOR) {
@@ -96,7 +96,7 @@ void decodificar(ifstream &ifs) {
 
     ofstream fichero_salida(fichero, ios::out | ios::binary);
     if (!fichero_salida) {
-        cerr << "No se puede crear el fichero " << fichero << endl;
+        cout << "No se puede crear el fichero " << fichero << endl;
         exit(0);
     }
 
@@ -131,7 +131,7 @@ void decodificar(ifstream &ifs) {
 
 int main(int argc, char *argv[]) { 
     if (argc == 1) {
-        cerr << "Uso: " << argv[0] << "<nombre_fichero> | -u <nombre_fichero>" << endl;
+        cout << "Uso: " << argv[0] << "<nombre_fichero> | -u <nombre_fichero>" << endl;
         exit(0);
     }
 
@@ -142,18 +142,18 @@ int main(int argc, char *argv[]) {
             exit(0);
         }
         decodificar(fichero_salida);
-    } else {
+    } else if(strcmp(argv[1], "-h")== 0){
+        cout << "Formas de uso" <<endl;
+        cout << "./lzw -u [file.lzw]" << "\t Utilice el comando -u para descomprimir el archivo deseado"<<endl;
+        cout << "./lzw [file] > [result].lzw" << "\t Utilice este comando para comprimir el archivo deseado" <<endl; 
+    }else
+    {
         ifstream fichero_entrada(argv[1], ios::in | ios::binary);
         if (!fichero_entrada) {
-            cerr << "No existe el fichero " << argv[1] << endl;
+            cout << "No existe el fichero " << argv[1] << endl;
             exit(0);
         }
         cout << argv[1] << SEPARADOR;
-
-        fichero_entrada.seekg(0, ios::end);
-        unsigned long tamanyo = fichero_entrada.tellg();        
-        fichero_entrada.seekg(0, ios::beg);
-        cout << tamanyo << SEPARADOR;
 
         codificar(fichero_entrada);    
     }
