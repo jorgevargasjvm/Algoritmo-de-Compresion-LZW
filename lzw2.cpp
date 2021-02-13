@@ -58,55 +58,61 @@ void decodificar(string filename)
     ifstream myfile (filename);
     if (myfile.is_open())
     {
-        string line;
-        getline (myfile,line);
-        ofstream outfile (line);
-        if (outfile.is_open())
-        {
-            getline (myfile,line);
+		
+		while(true){
+			string line;
+			getline (myfile,line);
+			ofstream outfile (line);
+			if(myfile.eof()){
+				break;
+			}
+			if (outfile.is_open())
+			{
+				getline (myfile,line);
 
 
-            string OC(line);
-            string buf;                
-            stringstream ss(OC);      
+				string OC(line);
+				string buf;                
+				stringstream ss(OC);      
 
-            vector<int> op; 
+				vector<int> op; 
 
-            while (ss >> buf){
-                op.push_back(stoi(buf));
-            }
+				while (ss >> buf){
+					op.push_back(stoi(buf));
+				}
 
-            unordered_map<int, string> table; 
-            for (int i = 0; i <= 255; i++) { 
-                string ch = ""; 
-                ch += char(i); 
-                table[i] = ch; 
-            } 
-            int old = op[0], n; 
-            string s = table[old]; 
-            string c = ""; 
-            c += s[0]; 
-            outfile << s; 
-            int count = 256; 
-            for (int i = 0; i < op.size() - 1; i++) { 
-                n = op[i + 1]; 
-                if (table.find(n) == table.end()) { 
-                    s = table[old]; 
-                    s = s + c; 
-                } 
-                else { 
-                    s = table[n]; 
-                } 
-                outfile << s; 
-                c = ""; 
-                c += s[0]; 
-                table[count] = table[old] + c; 
-                count++; 
-                old = n; 
-            } 
-          
-            outfile.close();
-        }
+				unordered_map<int, string> table; 
+				for (int i = 0; i <= 255; i++) { 
+					string ch = ""; 
+					ch += char(i); 
+					table[i] = ch; 
+				} 
+				int old = op[0], n; 
+				string s = table[old]; 
+				string c = ""; 
+				c += s[0]; 
+				outfile << s; 
+				int count = 256; 
+				for (int i = 0; i < op.size() - 1; i++) { 
+					n = op[i + 1]; 
+					if (table.find(n) == table.end()) { 
+						s = table[old]; 
+						s = s + c; 
+					} 
+					else { 
+						s = table[n]; 
+					} 
+					outfile << s; 
+					c = ""; 
+					c += s[0]; 
+					table[count] = table[old] + c; 
+					count++; 
+					old = n; 
+				} 
+			}
+		}
+				
+        
         myfile.close();
     }
 
@@ -127,11 +133,12 @@ int main(int argc, char *argv[]) {
         cout << "./lzw [file] > [result].lzw" << "\t Utilice este comando para comprimir el archivo deseado" <<endl; 
     }else
     {
-        vector<int> output_code = codificar(argv[1]); ; 
-        for (int i = 0; i < output_code.size(); i++) { 
-            cout << output_code[i] << " "; 
+        for(int i=1;i<argc;i++){
+            vector<int> output_code = codificar(argv[i]); ; 
+            for (int i = 0; i < output_code.size(); i++) { 
+                cout << output_code[i] << " "; 
+            }
+            cout << endl;
         }
-        cout << endl;
-        
     }
 } 
