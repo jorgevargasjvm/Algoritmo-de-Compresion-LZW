@@ -17,17 +17,15 @@
 using namespace std;
 
 // Convertir el índice del diccionario en una secuencia de bytes
-void secuencia_bytes(short int dato) {
+void secuencia_bytes(unsigned short int dato) {
     cout << (unsigned char) (dato >> 8);
     cout << (unsigned char) (dato & 255);
 }
 
 // Leer el valor entero de dos bytes en el fichero de entrada comprimido
-short int leer_valor(istream_iterator<unsigned char> &it) {
-    short int v = *it;
-    it++;
-    v = v * 256 + *it;
-    it++;
+short unsigned int leer_valor(ifstream &ifs) {
+    unsigned short int v = ifs.get();
+    v = v * 256 + ifs.get();
 
     return v;
 }
@@ -35,7 +33,7 @@ short int leer_valor(istream_iterator<unsigned char> &it) {
 // Codificar la secuencia de caracteres del flujo de entrada y sacar
 // la secuencia comprimida por salida estándar
 void codificar(ifstream &ifs) {
-    unordered_map<string, short int> diccionario;
+    unordered_map<string, unsigned short int> diccionario;
 
     for (int i = 0; i < 256; i++) {
         string s = "";
@@ -43,33 +41,33 @@ void codificar(ifstream &ifs) {
         diccionario[s] = i;
     }
 
-    istream_iterator<char> eos;
-    istream_iterator<char> iti (ifs);
     string p = "", c = "";
     unsigned short int codigo = 256;
 
-    p += (char) *iti;
-    while (iti != eos) {
-        iti++;
-        if (iti != eos)
-            c += *iti;
+    p += ifs.get();
+    bool ultimo = false;
+    while (!ifs.eof() && !ultimo) {
+        if (ifs.eof())
+            ultimo = true;
+        else
+            c += ifs.get();
+
         if (diccionario.find(p + c) != diccionario.end()) {
             p = p + c;
-        }
-        else {
+        } else {
             if (codigo == 65535) {
                 cerr << "Tabla de codificación completa, no se puede continuar" << endl;
                 exit(-1);
             }
             secuencia_bytes(diccionario[p]);
-            //cout << diccionario[p];
             diccionario[p + c] = codigo;
             codigo++;
             p = c;
-        }
+        } 
         c = "";
     }
     secuencia_bytes(diccionario[p]);
+    cout << SEPARADOR;
 }
 
 // Decodificar la secuencia de caracteres del flujo de entrada y guardar
@@ -77,32 +75,26 @@ void codificar(ifstream &ifs) {
 void decodificar(ifstream &ifs) {
     unordered_map<unsigned short int, string> diccionario;
 
-    for (int i = 0; i <= 255; i++) {
+    for (int i = 0; i < 256; i++) {
         string ch = "";
         ch += char(i);
         diccionario[i] = ch;
     }
 
-    istream_iterator<unsigned char> eos;
-    istream_iterator<unsigned char> iti (ifs);
-
-    while (iti != eos) {
+    char ch = 0;
+    string fichero = "";
+    while (!ifs.eof()) { 
         // El nombre del fichero de salida está al principio del
         // flujo de entrada, terminado en el caracter SEPARADOR
-        string fichero = "";
-        while ((unsigned char) *iti != SEPARADOR) {
-            fichero += (unsigned char) *iti;
-            iti++;
+        while ((ch = ifs.get()) != SEPARADOR && ch != EOF) {
+            fichero += ch;
         }
-        iti++;
+        if (ch == EOF) break;
 
         if (fichero == ESDIR) {
             fichero = "";
-            while ((unsigned char) *iti != SEPARADOR) {
-                fichero += (unsigned char) *iti;
-                iti++;
-            }
-            iti++;                
+            while ((ch = ifs.get()) != SEPARADOR)
+                fichero += ch;
 
             if (mkdir(fichero.c_str(), 0777) != 0) {
                 cerr << "No se puede crear el directorio " << fichero << endl;
@@ -125,11 +117,8 @@ void decodificar(ifstream &ifs) {
 
         // Leer la longitud del fichero antes de comprimir
         long int tamanyo = 0;
-        while ((unsigned char) *iti != SEPARADOR) {
-            tamanyo = tamanyo * 10 + (*iti - '0');
-            iti++;
-        }
-        iti++;
+        while ((ch = ifs.get()) != SEPARADOR)
+            tamanyo = tamanyo * 10 + (ch - '0');
 
         ofstream fichero_salida(fichero, ios::out | ios::binary);
         if (!fichero_salida) {
@@ -138,15 +127,15 @@ void decodificar(ifstream &ifs) {
         }
 
         cerr << "* Generando el fichero " << fichero << endl;
-        unsigned short int old = leer_valor(iti), n;
+        unsigned short int old = leer_valor(ifs), n;
         tamanyo -= 2;
         string s = diccionario[old], c = "";
         c += s[0];
         fichero_salida << s;
 
         unsigned short int contador = 256;
-        while (tamanyo >= 0) { //(iti != eos) {
-            n = leer_valor(iti); // Al leer el valor, el iterador apunta al que le sigue
+        while (tamanyo >= 0) { 
+            n = leer_valor(ifs); 
             if (diccionario.find(n) == diccionario.end()) {
                 s = diccionario[old];
                 s = s + c;
@@ -163,9 +152,9 @@ void decodificar(ifstream &ifs) {
             contador++;
             old = n;
         }
-
         cerr << "  Fichero " << fichero << " creado" << endl;
         fichero_salida.close();
+        while ((ch = ifs.get()) != SEPARADOR);
     }
 }
 
