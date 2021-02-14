@@ -13,7 +13,7 @@ Para descomprimir:
  ```
  ./lzw -u [name].lzw 
  ```
-Para help:
+Para ver como usar el lzw:
   ```
   ./lzw -h
   ```
