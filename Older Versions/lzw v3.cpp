@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <iterator>
 #include <string.h>
+#include <filesystem>
 
 #define EJEMPLO "WYS*WYGWYS*WYSWYSG"
 
@@ -11,7 +12,7 @@
 
 using namespace std;
 
-// Convertir el Ìndice del diccionario en una secuencia de bytes
+// Convertir el √≠ndice del diccionario en una secuencia de bytes
 void secuencia_bytes(short int dato) {
     cout << (unsigned char) (dato >> 8);
     cout << (unsigned char) (dato & 255);
@@ -28,7 +29,7 @@ short int leer_valor(istream_iterator<unsigned char> &it) {
 }
 
 // Codificar la secuencia de caracteres del flujo de entrada y sacar
-// la secuencia comprimida por salida est·ndar
+// la secuencia comprimida por salida est√°ndar
 void codificar(ifstream &ifs) {
     unordered_map<string, short int> diccionario;
 
@@ -53,7 +54,7 @@ void codificar(ifstream &ifs) {
         }
         else {
             if (codigo == 65535) {
-                cerr << "Tabla de codificaciÛn completa, no se puede continuar" << endl;
+                cerr << "Tabla de codificaci√≥n completa, no se puede continuar" << endl;
                 exit(-1);
             }
             secuencia_bytes(diccionario[p]);
@@ -82,7 +83,7 @@ void decodificar(ifstream &ifs) {
     istream_iterator<unsigned char> iti (ifs);
 
     while (iti != eos) {
-        // El nombre del fichero de salida est· al principio del
+        // El nombre del fichero de salida est√° al principio del
         // flujo de entrada, terminado en el caracter SEPARADOR
         string fichero = "";
         while ((unsigned char) *iti != SEPARADOR) {
