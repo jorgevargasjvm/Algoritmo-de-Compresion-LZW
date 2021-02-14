@@ -27,6 +27,6 @@ Este proyecto cuenta con dos formas de compresión:
   ```
   
   ###### LZW V5 es capaz de comprimir archivos y directorios
-  ###### LZW2 es capaz de comprimir multiples archivos
+  ###### LZW2 es capaz de comprimir múltiples archivos
 
 
