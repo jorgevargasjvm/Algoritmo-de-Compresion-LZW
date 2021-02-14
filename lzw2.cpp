@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
     } else if(strcmp(argv[1], "-h")== 0){
         cout << "Formas de uso" <<endl;
         cout << "./lzw -u [file.lzw]" << "\t Utilice el comando -u para descomprimir el archivo deseado"<<endl;
-        cout << "./lzw [file] > [result].lzw" << "\t Utilice este comando para comprimir el archivo deseado" <<endl; 
+        cout << "./lzw [files] [files] ... > [result].lzw" << "\t Utilice este comando para comprimir el archivo deseado" <<endl; 
     }else
     {
         for(int i=1;i<argc;i++){
