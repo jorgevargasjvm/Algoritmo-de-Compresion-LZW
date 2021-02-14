@@ -5,7 +5,7 @@ Este proyecto cuenta con dos formas de compresión:
 
 *lzw v5.cpp y lzw2.cpp*
 
-**Para compilar ejecutar el comando:**
+**Para compilar, ejecutar el comando:**
   ```
   g++ "lzw v5.cpp" -o lzw
   ```
