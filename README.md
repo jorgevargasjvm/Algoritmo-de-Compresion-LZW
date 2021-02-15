@@ -25,7 +25,7 @@ Este proyecto cuenta con dos formas de compresión:
   ```
   ./lzw -h
   ```
-  **Para usar el script**
+  **Para usar el scriptv2:**
   ```
   Tiene varias opciones:
 •	Sin argumentos: comprueba que el fichero ejecutable está en el directorio actual. Si está, añade este directorio al PATH.
